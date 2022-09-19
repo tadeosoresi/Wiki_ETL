@@ -2,10 +2,15 @@
 ETL que utiliza BeautifulSoup, PyMongo y PySpark.
 
 GUIDE:
+
 docker build --rm -t etl_image . (sobre el directorio del repo)
+
 docker-compose up -d (para levantar contenedores)
+
 docker exec -it etl_container bash (para ejecutar un bash dentro del contenedor de spark)
+
 python main.py --mode testing/production --mongo True (para correr el ETL)
+
 jupyter lab --ip 0.0.0.0 --no-browser --port 57000 --allow-root (para correr un servidor de jupyter en caso de querer)
 
 ## 🚀 Lista de mejoras
