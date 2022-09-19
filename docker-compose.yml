@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+  pyspark:
+    container_name: 'etl_container'
+    image: etl_image
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    ports:
+      - '4040:4040'
+      - '8888:57000'
+    volumes:
+      - ${PWD}:/home/yuno_test/
+    networks:
+      - yuno_network
+    depends_on:
+      - mongodb
+    links:
+      - mongodb
+  mongodb:
+    container_name: 'mongodb'
+    image: mongo:5.0
+    ports:
+      - '127.0.0.1:27018:27017'
+    expose:
+      - 27017
+    volumes:
+      - ~/apps/mongo:/data/db
+    networks:
+      yuno_network:
+        ipv4_address: 172.100.0.2
+    #environment: podemos agregar autenticacion
+      #- MONGO_INITDB_ROOT_USERNAME=dev
+      #- MONGO_INITDB_ROOT_PASSWORD=yuno
+networks:
+  yuno_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.100.0.0/16
+    name: yuno_network
+
+# docker-compose que levanta el contenedor de spark, y otro de mongo,
+# interconectados mediante una network.
+# El contenedor de spark expone los puertos 57000 (para el jupyter notebook)
+# ya que el server es publico, desde local accedemos por el 8888 (cuidado que no
+# este en uso), se persiste el directorio del repositorio (mediante volume).
+# El container de mongo inicia en la ip dada, con el puerto 27017 (local), y desde
+# nuestro host accedemos por el puerto 27018.
+# Pasos:
+  # docker-compose up -d
+  # docker exec -it pyspark_container bash y ya estariamos en el directorio dentro
+  # del contenedor
+  # jupyter lab --ip 0.0.0.0 --no-browser --allow-root -> para correr un jupyter lab
